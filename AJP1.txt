@@ -1,0 +1,118 @@
+package lab1;
+import java.awt.*;
+import java.awt.event.*;
+public class File1 extends Frame implements KeyListener {
+ private Label label;
+ private TextField textField;
+ public File1() {
+ setLayout(new FlowLayout());
+ setTitle("Key Event Demonstration");
+ setSize(400, 200);
+ label = new Label("Press any key to see its status.");
+ textField = new TextField(20);
+ textField.addKeyListener(this);
+ add(label);
+ add(textField);
+ setVisible(true);
+ addWindowListener(new WindowAdapter() {
+ public void windowClosing(WindowEvent we) {
+ dispose();
+ }
+ });
+ }
+
+ public void keyPressed(KeyEvent e) {
+ label.setText("Key Pressed: " + e.getKeyChar());
+ }
+
+ public void keyReleased(KeyEvent e) {
+ label.setText("Key Released: " + e.getKeyChar());
+ }
+public void keyTyped(KeyEvent e) {
+ label.setText("Key Typed: " + e.getKeyChar());
+ }
+ public static void main(String[] args) {
+ new File1();
+ }
+}
+
+
+"""CALCULATOR''''
+
+package lab1;
+import java.awt.*;
+import java.awt.event.*;
+public class File2 extends Frame implements ActionListener {
+ private TextField num1, num2, result;
+ private Button addButton, subButton, mulButton, divButton;
+ private Label label1, label2, labelResult;
+ public File2() {
+ setLayout(new FlowLayout());
+ setTitle("AWT Calculator");
+ setSize(400, 300);
+ label1 = new Label("Number 1:");
+ num1 = new TextField(10);
+
+ label2 = new Label("Number 2:");
+ num2 = new TextField(10);
+
+ labelResult = new Label("Result:");
+ result = new TextField(10);
+ result.setEditable(false);
+ addButton = new Button("+");
+ subButton = new Button("-");
+ mulButton = new Button("*");
+ divButton = new Button("/");
+ addButton.addActionListener(this);
+ subButton.addActionListener(this);
+ mulButton.addActionListener(this);
+ divButton.addActionListener(this);
+ add(label1);
+ add(num1);
+add(label2);
+ add(num2);
+ add(addButton);
+ add(subButton);
+ add(mulButton);
+ add(divButton);
+ add(labelResult);
+ add(result);
+ addWindowListener(new WindowAdapter() {
+ public void windowClosing(WindowEvent e) {
+ dispose();
+ }
+ });
+ setVisible(true);
+ }
+
+ public void actionPerformed(ActionEvent e) {
+ try {
+
+ double number1 = Double.parseDouble(num1.getText());
+ double number2 = Double.parseDouble(num2.getText());
+ double res = 0;
+
+ if (e.getSource() == addButton) {
+ res = number1 + number2;
+ } else if (e.getSource() == subButton) {
+ res = number1 - number2;
+ } else if (e.getSource() == mulButton) {
+ res = number1 * number2;
+ } else if (e.getSource() == divButton) {
+ if (number2 != 0) {
+ res = number1 / number2;
+ } else {
+ result.setText("Error: Division by 0");
+ return;
+ }
+ }
+
+ result.setText(String.valueOf(res));
+ } catch (NumberFormatException ex) {
+ result.setText("Error: Invalid input");
+ }
+ }
+ public static void main(String[] args) {
+ new File2();
+ }
+}

@@ -1,0 +1,85 @@
+1. Create Remote Interface
+import java.rmi.*;
+public interface PrimeI extends Remote
+{
+ boolean isPrime(int n) throws RemoteException;
+}
+2. Implement Remote Interface
+import java.rmi.*;
+import java.rmi.server.UnicastRemoteObject;
+public class PrimeC extends UnicastRemoteObject implements PrimeI
+{
+ PrimeC() throws RemoteException
+ {
+ super();
+ }
+ public boolean isPrime(int n)
+ {
+ if(n <= 1)
+ {
+ return false;
+ }
+ if(n > 1)
+ {
+ for(int i = 2; i <= Math.sqrt(n); i++)
+{
+ if(n % i == 0)
+ {
+ return false;
+ }
+ }
+ }
+ return true;
+ }
+}
+3. Create Server
+import java.rmi.*;
+import java.rmi.registry.*;
+public class ServerPrime
+{
+ public static void main(String[] args) throws Exception
+ {
+ Registry registry = LocateRegistry.createRegistry(5000);
+ PrimeC obj = new PrimeC();
+ registry.bind("CHECKPRIME", obj);
+ System.out.println("Server started successfully!");
+ }
+}
+4. Create Client
+import java.rmi.*;
+import java.util.Scanner;
+public class ClientPrime
+{
+ public static void main(String[] args) throws Exception
+ {
+ try
+ {
+ Scanner sc = new Scanner(System.in);PrimeI iobj = (PrimeI) Naming.lookup("rmi://localhost:5000/CHECKPRIME");
+ while (true) {
+ System.out.println("Enter input to check if it is a prime number : ");
+ if (!sc.hasNextInt()) {
+ System.out.println("Invalid input! Please enter a whole number.");
+ sc.next();
+ continue;
+ }
+ int n = sc.nextInt();
+ sc.nextLine();
+ if (iobj.isPrime(n)) {
+ System.out.println("It is a prime number.");
+ } else
+ System.out.println("It is not a prime number.");
+ System.out.println("Do you want to check another input? (Y/N) :");
+ String choice = sc.nextLine().trim().toLowerCase();
+ if(choice.equals("n"))
+ {
+ System.out.println("Exiting program...");
+ break;
+ }
+ }
+ }
+ catch (Exception e)
+ {
+ e.printStackTrace();
+ }
+ }
+}

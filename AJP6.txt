@@ -1,0 +1,38 @@
+import java.net.*;
+public class Main {
+public static void main(String[] args) {
+try {
+// 1. Get the local host address
+InetAddress localHost = InetAddress.getLocalHost();
+System.out.println("1. Local Host Address: " + localHost);
+System.out.println(" Host Name: " + localHost.getHostName());
+System.out.println(" IP Address: " + localHost.getHostAddress());
+// 2. Get the IP address of a domain (e.g., www.google.com)
+InetAddress googleIP = InetAddress.getByName("www.google.com");
+System.out.println("\n2. Google IP Address: " + googleIP);
+//3. Get all IP addresses associated with a domain (useful for load balancing)
+InetAddress[] googleIPs = InetAddress.getAllByName("www.google.com");
+System.out.println("\n3. All IP Addresses of Google:");
+for (InetAddress ip : googleIPs) {
+System.out.println(" " + ip);
+}
+// 4. Get an InetAddress object using a raw IP address
+byte[] rawIP = {8, 8, 8, 8}; // Google's public DNS server
+InetAddress googleDNS = InetAddress.getByAddress(rawIP);
+System.out.println("\n4. InetAddress from Raw IP: " + googleDNS);
+// 5. Get an InetAddress object using a hostname and raw IP address
+InetAddress customAddress = InetAddress.getByAddress("customHost", rawIP);
+System.out.println("\n5. InetAddress with Hostname and IP: "+customAddress);
+// Additional Instance Methods
+System.out.println("\n6. Additional Instance Methods:");
+System.out.println(" Host Name: " + googleIP.getHostName());
+System.out.println(" IP Address: " + googleIP.getHostAddress());
+System.out.println("Is Loopback Address:"+localHost.isLoopbackAddress());
+System.out.println("Is Multicast Address:"+ googleIP.isMulticastAddress());
+}
+catch (UnknownHostException e)
+{
+System.out.println("Error: Unknown host! " + e.getMessage());
+}
+}
+}

@@ -1,0 +1,147 @@
+Index.html
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Login Page</title>
+ <style>
+ body {
+ font-family: Arial, sans-serif;
+ background-color: #f4f4f9;
+ display: flex;
+ justify-content: center;
+ align-items: center;
+ height: 100vh;
+ margin: 0;
+ }
+ .form-container {
+ background: #fff
+padding: 20px 30px;
+ border-radius: 10px;
+ box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+ }
+ .form-container h2 {
+ margin-bottom: 20px;
+ color: #333;
+ }
+ .form-container label {
+ display: block;
+ margin-bottom: 5px;
+ color: #555;
+ }
+ .form-container input {
+ width: 100%;
+ padding: 10px;
+ margin-bottom: 15px;
+ border: 1px solid #ddd;
+ border-radius: 5px;
+ }
+ .form-container button {
+ background-color: #007bff;
+ color: white;
+ padding: 10px 15px;
+ border: none;
+ border-radius: 5px;
+ cursor: pointer;
+font-size: 16px;
+ }
+ .form-container button:hover {
+ background-color: #0056b3;
+ }
+ </style>
+</head>
+<body>
+ <div class="form-container">
+ <h2>Login Form</h2>
+ <form action="ClientSideServlet" method="post">
+ <label for="username">Username:</label>
+ <input type="text" id="username" name="username" required>
+ <label for="password">Password:</label>
+ <input type="password" id="password" name="password" required>
+ <button type="submit">Submit</button>
+ </form>
+ </div>
+</body>
+</html>
+web.xml
+<?xml version="1.0" encoding="UTF-8"?>
+<web-app xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://xmlns.jcp.org/xml/ns/javaee"
+xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/javaee http://xmlns.jcp.org/xml/ns/javaee/web-app_4_0.xsd"
+id="WebApp_ID" version="4.0">
+ <display-name>LoginPage</display-name>
+<servlet>
+ <servlet-name>ClientSideServlet</servlet-name>
+ <servlet-class>com.loginpage.ClientSideServlet</servlet-class>
+ </servlet>
+
+ <servlet-mapping>
+ <servlet-name>ClientSideServlet</servlet-name>
+ <url-pattern>/ClientSideServlet</url-pattern>
+ </servlet-mapping>
+
+ <servlet>
+ <servlet-name>AuthenticationServlet</servlet-name>
+ <servlet-class>com.loginpage.AuthenticationServlet</servlet-class>
+ </servlet>
+ <servlet-mapping>
+ <servlet-name>AuthenticationServlet</servlet-name>
+ <url-pattern>/AuthenticationServlet</url-pattern>
+ </servlet-mapping>
+
+ <welcome-file-list>
+ <welcome-file>index.html</welcome-file>
+ <welcome-file>index.jsp</welcome-file>
+ <welcome-file>index.htm</welcome-file>
+ <welcome-file>default.html</welcome-file>
+ <welcome-file>default.jsp</welcome-file>
+ <welcome-file>default.htm</welcome-file>
+ </welcome-file-list>
+</web-app>
+ClientSideServlet
+package com.loginpage;
+import java.io.IOException;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.http.*;
+public class ClientSideServlet extends HttpServlet
+{
+ private static final long serialVersionUID = 1L;
+ protected void doPost(HttpServletRequest request, HttpServletResponse response)
+ throws ServletException, IOException {
+ String username = request.getParameter("username");
+ String password = request.getParameter("password");
+ request.setAttribute("username", username);
+ request.setAttribute("password", password);
+ request.getRequestDispatcher("AuthenticationServlet").forward(request, response);
+ }
+}
+Authentication Servlet
+package com.loginpage;
+import java.io.IOException;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.http.*;
+public class AuthenticationServlet extends HttpServlet {
+ private static final long serialVersionUID = 1L;
+ protected void doPost(HttpServletRequest request, HttpServletResponse response)
+ throws ServletException, IOException
+ {
+ response.setContentType("text/html");
+ String u= "sahil.amrutkar@gmail.com";
+ String p= "Pass@123";
+ String username = (String) request.getAttribute("username");
+ String password = (String) request.getAttribute("password");
+
+ response.getWriter().println("<html><head><title>Authentication</title></head><body>");
+ response.getWriter().println( "<h2>Username: " + username + "</h2>");
+ response.getWriter().println( "<h2>Password: " + password + "</h2>");
+
+ if(username.equals(u) && password.equals(p))
+ {
+ response.getWriter().println("<h3 style=\"color: green;\">> User credentials verified </h3>");
+ }
+ else
+ {
+ response.getWriter().println( "<h3 style=\"color: red;\"> Invalid user </h3>" );
+}
+
+ }
+}

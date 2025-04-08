@@ -1,0 +1,63 @@
+package sem2_exp2;
+import java.awt.*;
+import java.awt.event.*;
+public class Exp2 extends WindowAdapter implements MouseListener {
+Frame f;
+Label l1,l2;
+TextArea ta;
+public Exp2(){
+f = new Frame();
+f.setVisible(true);
+f.setLayout(null);
+f.setSize(400,400);
+f.setTitle("Mouse Listner Interface .");
+init();
+add();
+register();
+}
+public void init() {
+l1 = new Label("Mouse Event Handling.");
+l2 = new Label();
+ta = new TextArea();
+l1.setBounds(40,40,250,50);
+ta.setBounds(40,100,300,200);
+l2.setBounds(40,300,250,50);
+Font labelFont = new Font("Arial", Font.BOLD, 20);
+ l1.setFont(labelFont);
+ l2.setFont(labelFont);
+}
+public void add() {
+f.add(l1);
+f.add(l2);
+f.add(ta);
+}
+public void register() {
+f.addWindowListener(this);
+ta.addMouseListener(this);
+}
+public void windowClosing(WindowEvent we) {
+ f.dispose();
+ }
+public void mouseEntered(MouseEvent e) {
+l2.setText("Mouse Entered.");
+ta.setBackground(Color.GRAY);
+}
+public void mouseExited(MouseEvent e) {
+l2.setText("Mouse Exited.");
+ta.setBackground(Color.BLACK);
+}
+public void mouseClicked(MouseEvent e) {
+l2.setText("Mouse Clicked.");
+ta.setBackground(Color.GREEN);
+}public void mouseReleased(MouseEvent e) {
+l2.setText("Mouse Released.");
+ta.setBackground(Color.RED);
+}
+public void mousePressed(MouseEvent e) {
+l2.setText("Mouse Pressed.");
+ta.setBackground(Color.YELLOW);
+}
+public static void main(String[] args) {
+new Exp2();
+}
+}
