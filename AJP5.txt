@@ -1,194 +1,93 @@
-package dbConnection;
-import java.sql.*;
-import java.util.Scanner;
-public class Exp4B {
- private Connection con;
- private Scanner scanner;
- public Exp4B() {
- scanner = new Scanner(System.in);
+Interface File
+package ajp_exp5;
+import java.rmi.*;
+public interface PrintI extends Remote {
+ void show() throws RemoteException;
+}
+Class file
+import java.rmi.*;
+import java.util.*;
+import java.rmi.server.*;
+import ajp_exp5.PrintI;
+public class PrintC extends UnicastRemoteObject implements PrintI {
+ public PrintC() throws RemoteException {
+ super();
  }
- public static void main(String[] args) {
- Exp4B obj = new Exp4B();
- try {
- obj.getConnection();
- obj.createTable();
- obj.menu();
- } catch (Exception e) {
- e.printStackTrace();
- } finally {
- obj.closeConnection();
+ public void show() {
+ Scanner sc = new Scanner(System.in);
+ int option = 1;
+ while (option == 1) {
+ int ch;
+ System.out.println("Choose 1 ");
+ System.out.println("1.) String");
+ System.out.println("2.) Number");
+ ch = sc.nextInt();
+ sc.nextLine();
+ switch (ch) {
+case 1:
+ String str;
+ System.out.println("Enter the string");
+ str = sc.nextLine();
+ str = str.replaceAll("\\s", "").toLowerCase();
+ String reversed = new StringBuilder(str).reverse().toString();
+ if (str.equals(reversed)) {
+ System.out.println("Entered String is Palindrome");
+ } else {
+ System.out.println("Entered String is not a Palindrome");
  }
- }
- public void getConnection() throws Exception {
- try {
- Class.forName("com.mysql.cj.jdbc.Driver");
- String url = "jdbc:mysql://localhost:3306/college";
- String username = "root";
- String password = "Sahil@2004";
- con = DriverManager.getConnection(url, username, password);
- System.out.println("Connection Established Successfully");
-} catch (ClassNotFoundException | SQLException e) {
- e.printStackTrace();
- }
- }
- public void createTable() {
- String query = "CREATE TABLE IF NOT EXISTS students ("
- + "rollNo VARCHAR(10) PRIMARY KEY, "
- + "name VARCHAR(50), "
- + "subject VARCHAR(50), "
- + "marks INT)";
- try (Statement stmt = con.createStatement()) {
- stmt.executeUpdate(query);
- System.out.println("Table 'students' is ready.");
- } catch (SQLException e) {
- e.printStackTrace();
- }
- }
- public void menu() {
- while (true) {
- System.out.println("\n Select an operation:");
- System.out.println("1. Insert Student");
- System.out.println("2. Read Students");
- System.out.println("3. Update Student");
- System.out.println("4. Delete Student");
- System.out.println("5. Exit");
- System.out.print("Enter choice: ");
- int choice = scanner.nextInt();
- scanner.nextLine();
- switch (choice) {
- case 1:
- insertStudent();
  break;
  case 2:
- readStudents();
+ int num;
+ System.out.println("Enter A number");
+ num = sc.nextInt();
+ int original = num, reversedn = 0;
+ while (num > 0) {
+ int digit = num % 10;
+ reversedn = reversedn * 10 + digit;
+ num /= 10;
+ }
+ if (original == reversedn) {
+ System.out.println("Entered Number is Palindrome");
+ } else {
+ System.out.println("Entered Number is not Palindrome");
+ }
  break;
- case 3:
- updateStudent();
- break;
- case 4:
- deleteStudent();
- break;
-case 5:
- System.out.println("Exiting...");
- return;
  default:
- System.out.println("Invalid choice. Try again.");
+ System.out.println("Wrong Option Please Try again");
+ }
+ System.out.println("Do you wish to continue(1/0)");
+ option = sc.nextInt();
  }
  }
- }
- public void insertStudent() {
- Derived student = new Derived();
- student.getData(scanner);
- String query = "INSERT INTO students (rollNo, name, subject, marks) VALUES (?, ?, ?, ?)";
- try (PreparedStatement pstmt = con.prepareStatement(query)) {
- pstmt.setString(1, student.getRollNo());
- pstmt.setString(2, student.getName());
- pstmt.setString(3, student.getSubject());
- pstmt.setInt(4, student.getMarks());
- int rows = pstmt.executeUpdate();
- if (rows > 0) {
- System.out.println("Student added successfully.");
- }
- } catch (SQLException e) {
- e.printStackTrace();
- }
- }
- public void readStudents() {
- String query = "SELECT * FROM students";
- try (Statement stmt = con.createStatement();
- ResultSet rs = stmt.executeQuery(query)) {
- System.out.println("\n2.Student Records:");
- while (rs.next()) {
- System.out.println(
- "Roll No: " + rs.getString("rollNo") +
- ", Name: " + rs.getString("name") +
- ", Subject: " + rs.getString("subject") +
- ", Marks: " + rs.getInt("marks")
- );
- }
- } catch (SQLException e) {
- e.printStackTrace();
- }
- }
- public void updateStudent() {
- System.out.print("Enter Roll No of student to update: ");
- String rollNo = scanner.nextLine();
- System.out.print("Enter new Marks: ");
- int newMarks = scanner.nextInt();
- scanner.nextLine();
- String query = "UPDATE students SET marks = ? WHERE rollNo = ?";
- try (PreparedStatement pstmt = con.prepareStatement(query)) {
- pstmt.setInt(1, newMarks);
- pstmt.setString(2, rollNo);
- int rows = pstmt.executeUpdate();
- if (rows > 0) {
- System.out.println("Student record updated.");
- } else {
- System.out.println("Student not found.");
- }
- } catch (SQLException e) {
- e.printStackTrace();
- }
- }
- public void deleteStudent() {
- System.out.print("Enter Roll No of student to delete: ");
- String rollNo = scanner.nextLine();
- String query = "DELETE FROM students WHERE rollNo = ?";
- try (PreparedStatement pstmt = con.prepareStatement(query)) {
- pstmt.setString(1, rollNo);
- int rows = pstmt.executeUpdate();
- if (rows > 0) {
- System.out.println("Student record deleted.");
- } else {
- System.out.println("Student not found.");
- }
- } catch (SQLException e) {
- e.printStackTrace();
- }
- }
-public void closeConnection() {
+}
+Server File
+package ajp_exp5;
+import java.rmi.*;
+import java.rmi.registry.*;
+import java.rmi.server.*;
+import ajp_exp5.PrintC;
+public class Server {
+ public static void main(String[] args) throws RemoteException, AlreadyBoundException {
+ PrintC obj = new PrintC();
+ Registry registry = LocateRegistry.createRegistry(5000);
  try {
- if (con != null) {
- con.close();
- System.out.println("Connection closed.");
- }
- } catch (SQLException e) {
+ registry.bind("DISPLAY", obj);
+ } catch (AlreadyBoundException e) {
  e.printStackTrace();
  }
- scanner.close();
  }
 }
-class Base {
- private String rollNo;
- private String name;
- public void getData(Scanner scanner) {
- System.out.print("Enter Roll No: ");
- this.rollNo = scanner.nextLine();
- System.out.print("Enter Name: ");
- this.name = scanner.nextLine();
+Client File
+package ajp_exp5;
+import java.rmi.*;
+import java.net.MalformedURLException;
+public class Client {
+ public static void main(String args[]) throws RemoteException, MalformedURLException {
+ try {
+ PrintI obj1 = (PrintI) Naming.lookup("rmi://localhost:5000/DISPLAY");
+ obj1.show();
+ } catch (NotBoundException e) {
+ e.printStackTrace();
  }
- public String getRollNo() {
- return rollNo;
- }
- public String getName() {
- return name;
- }
-}
-class Derived extends Base {
- private String subject;
- private int marks;
- public void getData(Scanner scanner) {
- super.getData(scanner);
- System.out.print("Enter Subject: ");
- this.subject = scanner.nextLine();
- System.out.print("Enter Marks: ");
- this.marks = scanner.nextInt();
- scanner.nextLine();
- }
- public String getSubject() {
- return subject;
- }
- public int getMarks() {
- return marks;
  }
 }
